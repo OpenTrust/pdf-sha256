@@ -644,8 +644,16 @@ public class PdfPKCS7 {
     public boolean verifyTimestampImprint() throws NoSuchAlgorithmException {
         if (timeStampToken == null)
             return false;
+        /*
         MessageImprint imprint = timeStampToken.getTimeStampInfo().toTSTInfo().getMessageImprint();
         byte[] md = MessageDigest.getInstance("SHA-1").digest(digest);
+        */
+        TSTInfo tstInfo = timeStampToken.getTimeStampInfo().toTSTInfo();
+		MessageImprint imprint = tstInfo.getMessageImprint();
+		AlgorithmIdentifier hashAlgorithm = imprint.getHashAlgorithm();
+        String algoId = hashAlgorithm.getObjectId().getId();
+		byte[] md = MessageDigest.getInstance(algoId).digest(digest);
+
         byte[] imphashed = imprint.getHashedMessage();
         boolean res = Arrays.equals(md, imphashed);
         return res;
